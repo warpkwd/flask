@@ -52,18 +52,18 @@ class DispatchingJinjaLoader(BaseLoader):
     def __init__(self, app):
         self.app = app
 
-    def get_source(self, environment, template):
+    def get_source(self, environment, template, apath):
         if self.app.config['EXPLAIN_TEMPLATE_LOADING']:
-            return self._get_source_explained(environment, template)
-        return self._get_source_fast(environment, template)
+            return self._get_source_explained(environment, template, apath)
+        return self._get_source_fast(environment, template, apath)
 
-    def _get_source_explained(self, environment, template):
+    def _get_source_explained(self, environment, template, apath):
         attempts = []
         trv = None
 
         for srcobj, loader in self._iter_loaders(template):
             try:
-                rv = loader.get_source(environment, template)
+                rv = loader.get_source(environment, template, apath)
                 if trv is None:
                     trv = rv
             except TemplateNotFound:
@@ -77,10 +77,10 @@ class DispatchingJinjaLoader(BaseLoader):
             return trv
         raise TemplateNotFound(template)
 
-    def _get_source_fast(self, environment, template):
+    def _get_source_fast(self, environment, template, apath):
         for srcobj, loader in self._iter_loaders(template):
             try:
-                return loader.get_source(environment, template)
+                return loader.get_source(environment, template, apath)
             except TemplateNotFound:
                 continue
         raise TemplateNotFound(template)
